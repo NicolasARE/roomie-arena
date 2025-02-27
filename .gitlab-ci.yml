@@ -1,0 +1,45 @@
+stages:
+  - lint
+  - build
+  - test
+
+variables:
+  NODE_ENV: test
+  DOTNET_VERSION: "8.0"
+
+lint_front:
+  stage: lint
+  script:
+    - npm install
+    - npm run lint
+
+lint_back:
+  stage: lint
+  script:
+    - dotnet tool install -g dotnet-format
+    - dotnet format --verify-no-changes
+
+build_front:
+  stage: build
+  script:
+    - npm install
+    - npm run build
+
+build_back:
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build --configuration Release
+
+test_front:
+  stage: test
+  script:
+    - npm run test
+
+test_back:
+  stage: test
+  script:
+    - dotnet test --logger trx
+  only:
+    - main
+    - merge_requests
